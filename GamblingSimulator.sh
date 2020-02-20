@@ -58,47 +58,59 @@ function getLuckyUnluckyDay(){
 }
 
 # COMPUTING AND STORING TOTAL AMOUNT OF WON OR LOST FOR MONTH
-for (( day=1; day<=$TOTAL_DAYS; day++ ))
-{
-	gambleResult=$(playGamble)
-	if [ $gambleResult -gt $STAKE_PER_DAY ]
-	then
-		((wonDays++))
-		gambleResult=$(($gambleResult-$stake))
-		totalWinInMonth=$(($totalWinInMonth+$gambleResult))
-	else
-		((lostDays++))
-		gambleResult=$(($gambleResult-$stake))
-		totalLostInMonth=$(($totalLostInMonth+$gambleResult))
-	fi
-	totalStake=$(($totalStake+$gambleResult))
-	resultOfMonth[Day$day]=$totalStake
-	if [ $day -eq 1 ]
-	then
-		luckyDayAmount=$totalStake
-		unLuckyDayAmount=$totalStake
-		luckyDay=$day
-		unLuckyDay=$day
-	fi
-	getLuckyUnluckyDay $totalStake $day
-}
+while [[ $stake -ge $limit && $totalStake -ge $limit ]]
+do
+	for (( day=1; day<=$TOTAL_DAYS; day++ ))
+	{
+		gambleResult=$(playGamble)
+		if [ $gambleResult -gt $STAKE_PER_DAY ]
+		then
+			((wonDays++))
+			gambleResult=$(($gambleResult-$stake))
+			totalWinInMonth=$(($totalWinInMonth+$gambleResult))
+		else
+			((lostDays++))
+			gambleResult=$(($gambleResult-$stake))
+			totalLostInMonth=$(($totalLostInMonth+$gambleResult))
+		fi
+		totalStake=$(($totalStake+$gambleResult))
+		resultOfMonth[Day$day]=$totalStake
+		if [ $day -eq 1 ]
+		then
+			luckyDayAmount=$totalStake
+			unLuckyDayAmount=$totalStake
+			luckyDay=$day
+			unLuckyDay=$day
+		fi
+		getLuckyUnluckyDay $totalStake $day
+	echo "Day$day : $totalStake"
+	}
 
 # DISPLAYING TOTAL AMOUNT OF WON OR LOST AFTER PLAYED FOR MONTH
-if [ $totalStake -gt $limit ]
-then
-	echo "You won $totalStake amount after 30 days"
-else
-	echo "You lost $totalStake amount after 30 days"
-fi
-echo "In month you won $totalWinInMonth in $wonDays days"
-echo "In month you lost $totalLostInMonth in $lostDays days"
+	if [ $totalStake -gt $limit ]
+	then
+		echo "You won $totalStake amount after 30 days"
+	else
+		echo "You lost $totalStake amount after 30 days"
+	fi
+	echo "In month you won $totalWinInMonth in $wonDays days"
+	echo "In month you lost $totalLostInMonth in $lostDays days"
 
 # DISPLAYING LUCKIEST DAY AND UNLUCKIEST DAY IN MONTH 
-if [ $luckyDayAmount -le $limit ]
-then
-	echo "Your Luckiest Day is day $luckyDay where you lost minimum $luckyDayAmount amount"
-else
-	echo "Your Luckiest Day is day $luckyDay where you won maximum $luckyDayAmount"
-fi
-echo "Your UnLuckiest Day is day $unLuckyDay where you lost maximum $unLuckyDayAmount"
+	if [ $luckyDayAmount -le $limit ]
+	then
+		echo "Your Luckiest Day is day $luckyDay where you lost minimum $luckyDayAmount amount"
+	else
+		echo "Your Luckiest Day is day $luckyDay where you won maximum $luckyDayAmount"
+	fi
+	echo "Your UnLuckiest Day is day $unLuckyDay where you lost maximum $unLuckyDayAmount"
+	echo "********************* End Of Month *********************"
 
+# REINITIALIZING VARIABLE FOR NEXT MONTH
+	wonDays=0
+	lostDays=0
+	totalWinInMonth=0
+	totalLostInMonth=0
+	luckyDay=0
+	unLuckyDay=0
+done
