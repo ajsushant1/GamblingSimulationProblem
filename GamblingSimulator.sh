@@ -18,6 +18,13 @@ wonDays=0
 lostDays=0
 totalWinInMonth=0
 totalLostInMonth=0
+luckyDayAmount=0
+unLuckyDayAmount=0
+luckyDay=0
+unLuckyDay=0
+
+# DECLARING DICTIONARY
+declare -A resultOfMonth
 
 # FUNCTION TO PLAY GAMBLE FOR A DAY
 function playGamble(){
@@ -35,7 +42,22 @@ function playGamble(){
 	stake=$STAKE_PER_DAY
 }
 
-# COMPUTING TOTAL AMOUNT OF WON OR LOST
+# FUNCTION TO GET LUCKY DAY AND UNLUCKY DAY AND AMOUNT
+function getLuckyUnluckyDay(){
+	input=$1
+	if [ $input -gt $luckyDayAmount ]
+	then
+		luckyDay=$2
+		luckyDayAmount=$input
+	fi
+	if [ $input -lt $unLuckyDayAmount ]
+	then
+		unLuckyDay=$2
+		unLuckyDayAmount=$input
+	fi
+}
+
+# COMPUTING AND STORING TOTAL AMOUNT OF WON OR LOST FOR MONTH
 for (( day=1; day<=$TOTAL_DAYS; day++ ))
 {
 	gambleResult=$(playGamble)
@@ -50,6 +72,15 @@ for (( day=1; day<=$TOTAL_DAYS; day++ ))
 		totalLostInMonth=$(($totalLostInMonth+$gambleResult))
 	fi
 	totalStake=$(($totalStake+$gambleResult))
+	resultOfMonth[Day$day]=$totalStake
+	if [ $day -eq 1 ]
+	then
+		luckyDayAmount=$totalStake
+		unLuckyDayAmount=$totalStake
+		luckyDay=$day
+		unLuckyDay=$day
+	fi
+	getLuckyUnluckyDay $totalStake $day
 }
 
 # DISPLAYING TOTAL AMOUNT OF WON OR LOST AFTER PLAYED FOR MONTH
@@ -61,3 +92,13 @@ else
 fi
 echo "In month you won $totalWinInMonth in $wonDays days"
 echo "In month you lost $totalLostInMonth in $lostDays days"
+
+# DISPLAYING LUCKIEST DAY AND UNLUCKIEST DAY IN MONTH 
+if [ $luckyDayAmount -le $limit ]
+then
+	echo "Your Luckiest Day is day $luckyDay where you lost minimum $luckyDayAmount amount"
+else
+	echo "Your Luckiest Day is day $luckyDay where you won maximum $luckyDayAmount"
+fi
+echo "Your UnLuckiest Day is day $unLuckyDay where you lost maximum $unLuckyDayAmount"
+
