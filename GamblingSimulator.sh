@@ -7,13 +7,13 @@ STAKE_PER_DAY=100
 BET_PER_GAME=1
 WIN=1
 TOTAL_DAYS=30
+LIMIT=0
 
 # VARIABLES
 stake=$STAKE_PER_DAY
 winLimit=$(($STAKE_PER_DAY+$(($STAKE_PER_DAY*50/100))))
 lossLimit=$(($STAKE_PER_DAY-$(($STAKE_PER_DAY*50/100))))
 totalStake=0
-limit=0
 wonDays=0
 lostDays=0
 totalWinInMonth=0
@@ -44,21 +44,21 @@ function playGamble(){
 
 # FUNCTION TO GET LUCKY DAY AND UNLUCKY DAY AND AMOUNT
 function getLuckyUnluckyDay(){
-	input=$1
-	if [ $input -gt $luckyDayAmount ]
+	amount=$1
+	if [ $amount -gt $luckyDayAmount ]
 	then
 		luckyDay=$2
-		luckyDayAmount=$input
+		luckyDayAmount=$amount
 	fi
-	if [ $input -lt $unLuckyDayAmount ]
+	if [ $amount -lt $unLuckyDayAmount ]
 	then
 		unLuckyDay=$2
-		unLuckyDayAmount=$input
+		unLuckyDayAmount=$amount
 	fi
 }
 
 # COMPUTING AND STORING TOTAL AMOUNT OF WON OR LOST FOR MONTH
-while [[ $stake -ge $limit && $totalStake -ge $limit ]]
+while [[ $stake -ge $LIMIT && $totalStake -ge $LIMIT ]]
 do
 	for (( day=1; day<=$TOTAL_DAYS; day++ ))
 	{
@@ -87,7 +87,7 @@ do
 	}
 
 # DISPLAYING TOTAL AMOUNT OF WON OR LOST AFTER PLAYED FOR MONTH
-	if [ $totalStake -gt $limit ]
+	if [ $totalStake -gt $LIMIT ]
 	then
 		echo "You won $totalStake amount after 30 days"
 	else
@@ -97,7 +97,7 @@ do
 	echo "In month you lost $totalLostInMonth in $lostDays days"
 
 # DISPLAYING LUCKIEST DAY AND UNLUCKIEST DAY IN MONTH 
-	if [ $luckyDayAmount -le $limit ]
+	if [ $luckyDayAmount -le $LIMIT ]
 	then
 		echo "Your Luckiest Day is day $luckyDay where you lost minimum $luckyDayAmount amount"
 	else
